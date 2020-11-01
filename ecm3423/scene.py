@@ -12,7 +12,7 @@ class Scene:
         glEnable(GL_DEPTH_TEST)
 
     def draw(self):
-        glClearColor(0.0, 0.0, 0.0, 0.0)
+        glClearColor(0.0, 0.0, 0.0, 1.0)
         glClear(GL_COLOR_BUFFER_BIT)
 
     def cursor_position_callback(self, window: glfw._GLFWwindow, x: float, y: float):
