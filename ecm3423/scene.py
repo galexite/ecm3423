@@ -7,6 +7,8 @@ class Scene:
     last_x = 0.
     last_y = 0.
 
+    mouse_button_pressed = False
+
     def __init__(self):
         self.camera = Camera()
 
@@ -19,7 +21,7 @@ class Scene:
         glClear(GL_COLOR_BUFFER_BIT)
 
     def cursor_position_callback(self, window: glfw._GLFWwindow, x: float, y: float):
-        if mouse_button_pressed:
+        if self.mouse_button_pressed:
             self.camera.translate(x, y)
 
     def key_callback(self, window: glfw._GLFWwindow, key: int, scancode: int, action: int, modifiers: int):
@@ -41,4 +43,8 @@ class Scene:
 
 
     def mouse_button_callback(self, window: glfw._GLFWwindow, button: int, action: int, modifiers: int):
-        pass
+        if button == glfw.MOUSE_BUTTON_LEFT:
+            if action == glfw.PRESS:
+                self.mouse_button_pressed = True
+            if action == glfw.RELEASE:
+                self.mouse_button_pressed = False

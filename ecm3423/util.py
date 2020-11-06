@@ -19,14 +19,14 @@ def build_elementary_rotation_matrix(theta: float) -> np.array:
 
 def build_rotation_matrix_x(psi: float) -> np.array:
     Rx = np.identity(4)
-    Rx[1:, 1:] = build_elementary_rotation_matrix(psi)
+    Rx[1:3, 1:3] = build_elementary_rotation_matrix(psi)
 
     return Rx
 
 
 def build_rotation_matrix_y(phi: float) -> np.array:
     Ry = np.identity(4)
-    Ry[:1, :1] = build_elementary_rotation_matrix(phi)
+    Ry[0:2, 0:2] = build_elementary_rotation_matrix(phi)
 
     return Ry
 
