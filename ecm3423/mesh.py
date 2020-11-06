@@ -13,7 +13,7 @@ class Mesh:
         self.vertices = vertices
         self.faces = faces
 
-        if normals == None:
+        if normals is None:
             self._calculate_normals()
         else:
             self.normals = normals

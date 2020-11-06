@@ -1,7 +1,7 @@
-from OpenGL.GL import *
 from typing import TypeVar
-from enum import Enum
+
 import numpy as np
+from OpenGL.GL import *
 
 
 class Uniform:
