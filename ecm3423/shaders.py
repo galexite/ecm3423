@@ -19,7 +19,7 @@ class Uniform:
         self._value = value
 
     def bind_float(self):
-
+        pass
 
 
 class Shaders:
