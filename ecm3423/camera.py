@@ -20,11 +20,11 @@ class Camera:
         self.T = build_translation_matrix([0., 0., -self.distance])
 
     def update(self):
-        self.V = np.matmul(np.matmul(T, R), D)
+        self.V = np.matmul(np.matmul(self.T, self.R), self.D)
 
     def rotate(self, psi: int, phi: int):
-        self.phi += phi * rot_speed
-        self.psi += psi * rot_speed
+        self.phi += phi * self.rot_speed
+        self.psi += psi * self.rot_speed
         self.R = build_rotation_matrix_xy(self.psi, self.phi)
 
         self.update()
