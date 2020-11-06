@@ -4,6 +4,9 @@ import glfw
 
 
 class Scene:
+    last_x = 0.
+    last_y = 0.
+
     def __init__(self):
         self.camera = Camera()
 
@@ -16,7 +19,8 @@ class Scene:
         glClear(GL_COLOR_BUFFER_BIT)
 
     def cursor_position_callback(self, window: glfw._GLFWwindow, x: float, y: float):
-        pass
+        if mouse_button_pressed:
+            self.camera.translate(x, y)
 
     def key_callback(self, window: glfw._GLFWwindow, key: int, scancode: int, action: int, modifiers: int):
         if key == glfw.KEY_L:
