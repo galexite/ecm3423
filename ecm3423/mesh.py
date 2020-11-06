@@ -1,9 +1,12 @@
-from enum import Enum
 from typing import Optional
 import numpy as np
 
 
 class Mesh:
+    """
+    Represents a mesh imported from a Wavefront OBJ file on disk, to render to a scene.
+    """
+
     def __init__(
         self, vertices: np.array, faces: np.array, normals: Optional[np.array] = None
     ):
@@ -21,17 +24,20 @@ class Mesh:
         """
         self.normals = np.zeros((self.vertices.shape[0], 3), dtype="f")
 
-        for i, f in enumerate(self.faces):
+        for f in self.faces:
             u = self.vertices[f[1]] - self.vertices[f[0]]
             v = self.vertices[f[2]] - self.vertices[f[0]]
 
             normal = np.cross(u, v)
             self.normals[f, :] += normal / np.linalg.norm(normal)
-        
+
         self.normals /= np.linalg.norm(self.normals, axis=1, keepdims=True)
 
     @staticmethod
     def from_obj_file(path: str) -> "Mesh":
+        """
+        Create a new Mesh object from a Wavefront OBJ file stored on disk at the given path.
+        """
         vertices = []
         faces = []
 
@@ -47,7 +53,7 @@ class Mesh:
                             f"{path}, line {num}: v must by accompanied by 3 float components"
                         )
 
-                    vertices.append(spl[1:]) # numpy casts to float for us later
+                    vertices.append(spl[1:])  # numpy casts to float for us later
                     continue
                 elif spl[0] == "f":
                     if len(spl) != 4 and len(spl) != 5:
