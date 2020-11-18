@@ -40,7 +40,7 @@ class Scene:
         """
         Configure OpenGL before we start drawing.
         """
-        #glEnable(GL_CULL_FACE)
+        glEnable(GL_CULL_FACE)
         glEnable(GL_DEPTH_TEST)
 
         bunny = Model(Mesh.from_obj_file("models/bunny_world.obj"), self.shaders)
@@ -51,7 +51,7 @@ class Scene:
         Draw our scene's objects to the screen.
         """
         glClearColor(0.52, 0.8, 0.92, 1.0)
-        glClear(GL_COLOR_BUFFER_BIT)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         self.camera.update()
 

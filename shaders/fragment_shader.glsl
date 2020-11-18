@@ -43,8 +43,7 @@ void main() {
 
       // 5. Finally, we combine the shading components
       // we do not apply the texture to the specular component.
-      final_color = vec4(0.0, 0.0, 0.0, 1.0);
-      //final_color = ambient + attenuation*(diffuse + specular);
+      final_color = ambient + attenuation*(diffuse + specular);
 }
 
 

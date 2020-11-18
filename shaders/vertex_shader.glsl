@@ -31,5 +31,5 @@ void main() {
     // fragment_texCoord = texCoord;
 
     // 3. for now, we just pass on the color from the data array.
-    fragment_color = vec3(0.0, 0.0, 0.0);
+    fragment_color = vec3(1.0, 1.0, 1.0);
 }
