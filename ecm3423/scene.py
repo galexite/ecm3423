@@ -40,12 +40,11 @@ class Scene:
         """
         Configure OpenGL before we start drawing.
         """
-        glEnable(GL_CULL_FACE)
+        #glEnable(GL_CULL_FACE)
         glEnable(GL_DEPTH_TEST)
 
-        self.models = [Model(Mesh.from_obj_file("models/bunny_world.obj"))]
-
-        self.shaders.compile_and_link()
+        bunny = Model(Mesh.from_obj_file("models/bunny_world.obj"), self.shaders)
+        self.models = [bunny]
 
     def draw(self):
         """
@@ -57,7 +56,7 @@ class Scene:
         self.camera.update()
 
         for model in self.models:
-            model.draw(self.camera.V, self.P, self.shaders)
+            model.draw(self.camera.V, self.P)
 
     def cursor_position_callback(self, _window: glfw._GLFWwindow, x: float, y: float):
         """

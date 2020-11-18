@@ -1,4 +1,4 @@
-from typing import TypeVar
+from typing import TypeVar, Dict
 
 import numpy as np
 from OpenGL.GL import *
@@ -79,7 +79,11 @@ class Shaders:
         with open(fragment_shader_path, "r") as fsh:
             self.fragment_shader_source = fsh.read()
 
-    def compile_and_link(self):
+    def bind_attributes(self, attributes: Dict):
+        for name, location in attributes.items():
+            glBindAttribLocation(self.program, location, name)
+
+    def compile_and_link(self, attributes: Dict):
         """
         Compile the shader source and link this program.
         """
@@ -94,6 +98,8 @@ class Shaders:
         self.program = glCreateProgram()
         glAttachShader(self.program, self.vertex_shader)
         glAttachShader(self.program, self.fragment_shader)
+
+        self.bind_attributes(attributes)
 
         glLinkProgram(self.program)
         glValidateProgram(self.program)

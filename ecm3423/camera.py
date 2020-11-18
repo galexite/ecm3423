@@ -18,7 +18,7 @@ class Camera:
         self.V = np.identity(4)
         self.V[2, 3] = -5.0
 
-        self.D = -build_translation_matrix(self.center)
+        self.D = build_translation_matrix(self.center)
         self.R = build_rotation_matrix_xy(self.psi, self.phi)
         self.T = build_translation_matrix([0.0, 0.0, -self.distance])
 
@@ -44,6 +44,6 @@ class Camera:
         """
         self.center[0] += dx
         self.center[1] += dy
-        self.D = -build_translation_matrix(self.center)
+        self.D = build_translation_matrix(self.center)
 
         self.update()
