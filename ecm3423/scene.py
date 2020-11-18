@@ -63,7 +63,10 @@ class Scene:
         Handle updates to the mouse cursor's position.
         """
         if self.mouse_button_pressed:
-            self.camera.translate(x, y)
+            self.camera.translate(self.last_x - x, y - self.last_y)
+
+        self.last_x = x
+        self.last_y = y
 
     def key_callback(
         self,

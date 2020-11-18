@@ -13,6 +13,7 @@ class Camera:
     distance = 5.0
 
     rot_speed = 0.5
+    translate_speed = 0.1
 
     def __init__(self):
         self.V = np.identity(4)
@@ -42,8 +43,8 @@ class Camera:
         """
         Move the camera by the given delta x/y coordinates.
         """
-        self.center[0] += dx
-        self.center[1] += dy
+        self.center[0] += dx * self.translate_speed
+        self.center[1] += dy * self.translate_speed
         self.D = build_translation_matrix(self.center)
 
         self.update()
