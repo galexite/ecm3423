@@ -28,7 +28,7 @@ class Model:
 
         self.vbo[name] = glGenBuffers(1)
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo[name])
-        
+
         glEnableVertexAttribArray(attrib)
         glVertexAttribPointer(attrib, value.shape[1], GL_FLOAT, False, 0, None)
         glBufferData(GL_ARRAY_BUFFER, value, GL_STATIC_DRAW)
@@ -54,7 +54,7 @@ class Model:
         if self.index_buffer is not None:
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.index_buffer)
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, self.mesh.faces, GL_STATIC_DRAW)
-        
+
         glBindVertexArray(0)
 
     def set_mesh(self, mesh: Mesh):

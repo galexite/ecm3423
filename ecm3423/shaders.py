@@ -36,14 +36,20 @@ class Uniform:
                 if self.value.shape[0] == 4 and self.value.shape[1] == 4:
                     glUniformMatrix4fv(self.location, 1, True, self.value)
                 else:
-                    raise RuntimeError(f"Unable to bind uniform `{self.name}': matrix must be 4x4")
+                    raise RuntimeError(
+                        f"Unable to bind uniform `{self.name}': matrix must be 4x4"
+                    )
         else:
-            raise RuntimeError(f"Unable to bind uniform `{self.name}': unsupported type `{type(self.value)}'")
+            raise RuntimeError(
+                f"Unable to bind uniform `{self.name}': unsupported type `{type(self.value)}'"
+            )
+
 
 class Shaders:
     """
     Represents a GL shader program.
     """
+
     light = np.array([2.0, 2.0, 0.0], "f")
     Ia = np.array([0.2, 0.2, 0.2], "f")
     Id = np.array([0.9, 0.9, 0.9], "f")
@@ -51,17 +57,16 @@ class Shaders:
     Ka = np.array([1.0, 1.0, 1.0], "f")
     Kd = np.array([1.0, 1.0, 1.0], "f")
     Ks = np.array([1.0, 1.0, 1.0], "f")
-    Ns = 10.
+    Ns = 10.0
 
     def __init__(self, vertex_shader_path: str, fragment_shader_path: str):
         self.vertex_shader = None
         self.fragment_shader = None
         self.program = None
-        
+
         self.uniforms = {
             "PVM": Uniform("PVM"),
             "VM": Uniform("VM"),
-
             # We already know what model we're using, so hard-code these.
             "light": Uniform("light", np.array([0.0, 0.0, 0.0], "f")),
             "Ia": Uniform("Ia", self.Ia),
@@ -70,7 +75,7 @@ class Shaders:
             "Ka": Uniform("Ka", self.Ka),
             "Kd": Uniform("Kd", self.Kd),
             "Ks": Uniform("Ks", self.Ks),
-            "Ns": Uniform("Ns", self.Ns)
+            "Ns": Uniform("Ns", self.Ns),
         }
 
         with open(vertex_shader_path, "r") as vsh:
@@ -108,7 +113,9 @@ class Shaders:
         for name in self.uniforms:
             location = glGetUniformLocation(self.program, name)
             if location == -1:
-                raise RuntimeError(f"Failed to link shader program: no such uniform `{name}'")
+                raise RuntimeError(
+                    f"Failed to link shader program: no such uniform `{name}'"
+                )
 
             self.uniforms[name].location = location
 

@@ -52,25 +52,37 @@ def build_rotation_matrix_xy(psi: float, phi: float) -> np.array:
     return np.matmul(build_rotation_matrix_x(psi), build_rotation_matrix_y(phi))
 
 
-def build_orthographic_projection_matrix(left: float, right: float, bottom: float, top: float, near: float, far: float) -> np.array:
-    return np.array([
-        [2 / (right - left), 0, 0, (right + left) / (right - left)],
-        [0, -2 / (top - bottom), 0, (top + bottom) / (top - bottom)],
-        [0, 0, 2 / (far - near), (far + near) / (far - near)],
-        [0, 0, 0, 1]
-    ])
+def build_orthographic_projection_matrix(
+    left: float, right: float, bottom: float, top: float, near: float, far: float
+) -> np.array:
+    return np.array(
+        [
+            [2 / (right - left), 0, 0, (right + left) / (right - left)],
+            [0, -2 / (top - bottom), 0, (top + bottom) / (top - bottom)],
+            [0, 0, 2 / (far - near), (far + near) / (far - near)],
+            [0, 0, 0, 1],
+        ]
+    )
 
 
-def build_frustum_matrix(left: float, right: float, bottom: float, top: float, near: float, far: float) -> np.array:
-    return np.array([
-        [2 * near / (right - left), 0, (right + left) / (right - left), 0],
-        [0, -2 * near / (top - bottom), (top + bottom) / (top - bottom), 0],
-        [0, 0, -(far + near) / (far - near), -2 * far * near / (far - near)],
-        [0, 0, -1, 0]
-    ])
+def build_frustum_matrix(
+    left: float, right: float, bottom: float, top: float, near: float, far: float
+) -> np.array:
+    return np.array(
+        [
+            [2 * near / (right - left), 0, (right + left) / (right - left), 0],
+            [0, -2 * near / (top - bottom), (top + bottom) / (top - bottom), 0],
+            [0, 0, -(far + near) / (far - near), -2 * far * near / (far - near)],
+            [0, 0, -1, 0],
+        ]
+    )
 
 
-def build_pose_matrix(position: List[float] = [0, 0, 0], orientation: float = 0, scale: List[float] = [1, 1, 1]):
+def build_pose_matrix(
+    position: List[float] = [0, 0, 0],
+    orientation: float = 0,
+    scale: List[float] = [1, 1, 1],
+):
     R = build_rotation_matrix_z(orientation)
     T = build_translation_matrix(position)
     S = build_scale_matrix(scale[0], scale[1], scale[2])
@@ -79,7 +91,7 @@ def build_pose_matrix(position: List[float] = [0, 0, 0], orientation: float = 0,
 
 
 def homogenise(vec):
-    return np.hstack([vec, 1.])
+    return np.hstack([vec, 1.0])
 
 
 def unhomogenise(vec):
