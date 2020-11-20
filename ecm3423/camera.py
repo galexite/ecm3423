@@ -13,7 +13,7 @@ class Camera:
     distance = 5.0
 
     rot_speed = 0.5
-    translate_speed = 0.1
+    translate_speed = 0.01
 
     def __init__(self):
         self.V = np.identity(4)

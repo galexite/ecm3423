@@ -3,16 +3,17 @@ from typing import Any
 from OpenGL.GL import *
 import numpy as np
 
+from ecm3423.material import Material
 from ecm3423.mesh import Mesh
 from ecm3423.shaders import Shaders
 from ecm3423.util import build_pose_matrix
 
 
 class Model:
-    def __init__(self, mesh: Mesh, shaders: Shaders, M: np.array = build_pose_matrix()):
+    def __init__(self, mesh: Mesh, material: Material, M: np.array = build_pose_matrix()):
         self.M = M
         self.vao = glGenVertexArrays(1)
-        self.vbo = {}
+        self.vbos = {}
         self.attributes = {}
         self.index_buffer = None
 
@@ -21,13 +22,13 @@ class Model:
         self.n_elements = 0
 
         self.set_mesh(mesh)
-        self.set_shaders(shaders)
+        self.set_material(material)
 
     def _add_vbo(self, name: str, value: Any):
-        self.attributes[name] = attrib = len(self.vbo)
+        self.attributes[name] = attrib = len(self.vbos)
 
-        self.vbo[name] = glGenBuffers(1)
-        glBindBuffer(GL_ARRAY_BUFFER, self.vbo[name])
+        self.vbos[name] = glGenBuffers(1)
+        glBindBuffer(GL_ARRAY_BUFFER, self.vbos[name])
 
         glEnableVertexAttribArray(attrib)
         glVertexAttribPointer(attrib, value.shape[1], GL_FLOAT, False, 0, None)
@@ -61,20 +62,18 @@ class Model:
         self.mesh = mesh
         self.primitive = GL_TRIANGLES
         self.n_vertices = self.mesh.vertices.shape[0]
-
         self._bind()
 
-    def set_shaders(self, shaders: Shaders):
-        self.shaders = shaders
-        self.shaders.compile_and_link(self.attributes)
+    def set_material(self, material: Material):
+        self.material = material
+        self.material.bind(self.attributes)
 
     def draw(self, V: np.array, P: np.array):
         """
         Draw the mesh to the scene.
         """
         glBindVertexArray(self.vao)
-
-        self.shaders.use(P, V, self.M)
+        self.material.use(P, V, self.M)
 
         if self.index_buffer is None:
             glDrawArrays(self.primitive, 0, self.n_vertices)
@@ -82,9 +81,8 @@ class Model:
             glDrawElements(self.primitive, self.n_elements, GL_UNSIGNED_INT, None)
 
         glBindVertexArray(0)
-        self.shaders.remove()
 
     def __del__(self):
-        for vbo in self.vbo.items():
-            glDeleteBuffers(1, vbo)
-        glDeleteVertexArrays(self.vao)
+        vbos_values = list(self.vbos.values())
+        glDeleteBuffers(len(vbos_values), np.array(vbos_values))
+        glDeleteVertexArrays(1, np.array([self.vao]))

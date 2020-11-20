@@ -1,11 +1,17 @@
+from os.path import realpath, join, dirname
+
+import numpy as np
 from OpenGL.GL import *
 import glfw
 
 from ecm3423.camera import Camera
-from ecm3423.shaders import Shaders
+from ecm3423.material import Fur, Material
+from ecm3423.shaders import ShaderStore
 from ecm3423.mesh import Mesh
 from ecm3423.model import Model
-from ecm3423.util import build_frustum_matrix
+from ecm3423.util import build_frustum_matrix, build_rotation_matrix_z, build_rotation_matrix_y, build_rotation_matrix_x
+
+RESOURCE_PATH = join(dirname(realpath(__file__)), "..")
 
 
 class Scene:
@@ -22,10 +28,7 @@ class Scene:
 
     def __init__(self):
         self.camera = Camera()
-        self.shaders = Shaders(
-            vertex_shader_path="shaders/vertex_shader.glsl",
-            fragment_shader_path="shaders/fragment_shader.glsl",
-        )
+        self.shader_store = ShaderStore(join(RESOURCE_PATH, "shaders"))
 
         near = 1.5
         far = 50
@@ -43,8 +46,12 @@ class Scene:
         glEnable(GL_CULL_FACE)
         glEnable(GL_DEPTH_TEST)
 
-        bunny = Model(Mesh.from_obj_file("models/bunny_world.obj"), self.shaders)
-        self.models = [bunny]
+        self.shader_store.compile()
+
+        mesh = Mesh.from_obj_file(join(RESOURCE_PATH, "models/bunny_world.obj"))
+        fur = Fur(self.shader_store.get("fur"))
+        bunny = Model(mesh, fur, M=build_rotation_matrix_y(np.pi / 2.))
+        self.models.append(bunny)
 
     def draw(self):
         """

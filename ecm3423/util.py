@@ -2,7 +2,7 @@ import numpy as np
 from typing import List
 
 
-def build_translation_matrix(t: int) -> np.array:
+def build_translation_matrix(t: List[float]) -> np.array:
     n = len(t)
     T = np.identity(n + 1, dtype="f")
     T[:n, -1] = t
