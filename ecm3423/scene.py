@@ -45,6 +45,9 @@ class Scene:
         """
         glEnable(GL_CULL_FACE)
         glEnable(GL_DEPTH_TEST)
+        glEnable(GL_BLEND)
+
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
         self.shader_store.compile()
 
@@ -52,6 +55,9 @@ class Scene:
         fur = Fur(self.shader_store.get("fur"))
         bunny = Model(mesh, fur, M=build_rotation_matrix_y(np.pi / 2.))
         self.models.append(bunny)
+
+        # bunny_2 = Model(mesh, Material(self.shader_store.get("normals")), M=build_rotation_matrix_y(np.pi / 2.))
+        # self.models.append(bunny_2)
 
     def draw(self):
         """

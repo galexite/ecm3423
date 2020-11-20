@@ -194,6 +194,10 @@ class ShaderStore:
                 fragment_shader_path=join(path, "fur/fragment.glsl"),
                 geometry_shader_path=join(path, "fur/geometry.glsl")
             ),
+            "normals": Shaders(
+                vertex_shader_path=join(path, "normals/vertex.glsl"),
+                fragment_shader_path=join(path, "normals/fragment.glsl"),
+            ),
             "phong": Shaders(
                 vertex_shader_path=join(path, "phong/vertex_shader.glsl"),
                 fragment_shader_path=join(path, "phong/fragment_shader.glsl")

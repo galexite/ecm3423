@@ -1,6 +1,7 @@
 #version 150
 
 uniform mat4 PVM;
+uniform mat4 VM;
 uniform mat3 VMiT;
 
 in vec3 position;
@@ -13,5 +14,5 @@ out VS_OUT {
 void main()
 {
     vs_out.normal = normalize(VMiT * normal);
-    gl_Position = PVM * vec4(position, 1.0);
+    gl_Position = PVM * vec4(position, 1.0f);
 }
