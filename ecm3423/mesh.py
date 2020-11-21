@@ -28,8 +28,7 @@ class Mesh:
             u = self.vertices[f[1]] - self.vertices[f[0]]
             v = self.vertices[f[2]] - self.vertices[f[0]]
 
-            normal = np.cross(u, v)
-            self.normals[f, :] += normal / np.linalg.norm(normal)
+            self.normals[f, :] += np.cross(u, v)
 
         self.normals /= np.linalg.norm(self.normals, axis=1, keepdims=True)
 

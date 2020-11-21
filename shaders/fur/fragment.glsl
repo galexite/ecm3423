@@ -1,17 +1,21 @@
 #version 150
 
+uniform vec3 color;
+
+uniform vec3 light;
 uniform sampler2D noise_texture;
 
-in GS_OUT {
-    float layer;
+in VS_OUT {
     vec3 normal;
+    vec3 position_in_view_space;
+    float layer;
 } fs_in;
 
-out vec4 color;
+out vec4 frag_color;
 
 void main()
 {
-    vec3 normal = normalize(fs_in.normal);
-    color = texture(noise_texture, normal.xy);
-    color.a *= 1 - fs_in.layer;
+    vec4 sample = texture(noise_texture, fs_in.normal.xy / 5.0);
+    frag_color = vec4(mix(0.2, 1.0, fs_in.layer) * color,
+        fs_in.layer == 0.0 ? 1.0 : sample.r * (1 - fs_in.layer));
 }

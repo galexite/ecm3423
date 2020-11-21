@@ -12,7 +12,7 @@ class Camera:
     phi = 0.0
     distance = 5.0
 
-    rot_speed = 0.5
+    rot_speed = 0.2
     translate_speed = 0.01
 
     def __init__(self):

@@ -5,10 +5,9 @@ from OpenGL.GL import *
 import glfw
 
 from ecm3423.camera import Camera
-from ecm3423.material import Fur, Material
 from ecm3423.shaders import ShaderStore
 from ecm3423.mesh import Mesh
-from ecm3423.model import Model
+from ecm3423.fur_model import FurModel
 from ecm3423.util import build_frustum_matrix, build_rotation_matrix_z, build_rotation_matrix_y, build_rotation_matrix_x
 
 RESOURCE_PATH = join(dirname(realpath(__file__)), "..")
@@ -24,7 +23,7 @@ class Scene:
 
     mouse_button_pressed = False
 
-    models = []
+    model = None
 
     def __init__(self):
         self.camera = Camera()
@@ -46,15 +45,14 @@ class Scene:
         glEnable(GL_CULL_FACE)
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_BLEND)
+        glEnable(GL_MULTISAMPLE)
 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
         self.shader_store.compile()
 
         mesh = Mesh.from_obj_file(join(RESOURCE_PATH, "models/bunny_world.obj"))
-        fur = Fur(self.shader_store.get("fur"))
-        bunny = Model(mesh, fur, M=build_rotation_matrix_y(np.pi / 2.))
-        self.models.append(bunny)
+        self.model = FurModel(mesh, self.shader_store.get("fur"), M=build_rotation_matrix_y(np.pi / 2.))
 
         # bunny_2 = Model(mesh, Material(self.shader_store.get("normals")), M=build_rotation_matrix_y(np.pi / 2.))
         # self.models.append(bunny_2)
@@ -68,10 +66,9 @@ class Scene:
 
         self.camera.update()
 
-        for model in self.models:
-            model.draw(self.camera.V, self.P)
+        self.model.draw(self.P, self.camera.V)
 
-    def cursor_position_callback(self, _window: glfw._GLFWwindow, x: float, y: float):
+    def cursor_position_callback(self, _window: glfw._GLFWwindow, x: int, y: int):
         """
         Handle updates to the mouse cursor's position.
         """
@@ -106,7 +103,16 @@ class Scene:
             pass
         elif key == glfw.KEY_B:
             # move fur in random direction
-            pass
+            self.model.gravity = np.random.default_rng().normal()
+            self.model.build_fur_mesh()
+        elif key == glfw.KEY_UP:
+            self.camera.rotate(-1, 0)
+        elif key == glfw.KEY_DOWN:
+            self.camera.rotate(1, 0)
+        elif key == glfw.KEY_LEFT:
+            self.camera.rotate(0, -1)
+        elif key == glfw.KEY_RIGHT:
+            self.camera.rotate(0, 1)
 
     def mouse_button_callback(
         self, window: glfw._GLFWwindow, button: int, action: int, _modifiers: int

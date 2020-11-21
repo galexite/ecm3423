@@ -58,9 +58,11 @@ class Shaders:
     Ka = np.array([1.0, 1.0, 1.0], "f")
     Kd = np.array([1.0, 1.0, 1.0], "f")
     Ks = np.array([1.0, 1.0, 1.0], "f")
+    color = np.array([150 / 255, 128 / 255, 124 / 255], "f")
     Ns = 10.0
 
-    def __init__(self, vertex_shader_path: str, fragment_shader_path: str, geometry_shader_path: Optional[str] = None):
+    def __init__(self, name: str, vertex_shader_path: str, fragment_shader_path: str):
+        self.name = name
         self.vertex_shader = None
         self.fragment_shader = None
         self.geometry_shader = None
@@ -69,10 +71,11 @@ class Shaders:
 
         self.uniforms = {
             "PVM": Uniform("PVM"),
-            # "VM": Uniform("VM"),
+            "VM": Uniform("VM"),
             "VMiT": Uniform("VMiT"),
+            "color": Uniform("color", self.color),
             # We already know what model we're using, so hard-code these.
-            # "light": Uniform("light", np.array([0.0, 0.0, 0.0], "f")),
+            # "light": Uniform("light"),
             # "Ia": Uniform("Ia", self.Ia),
             # "Id": Uniform("Id", self.Id),
             # "Is": Uniform("Is", self.Is),
@@ -87,10 +90,6 @@ class Shaders:
 
         with open(fragment_shader_path, "r") as fsh:
             self.fragment_shader_source = fsh.read()
-
-        if geometry_shader_path is not None:
-            with open(geometry_shader_path, "r") as gsh:
-                self.geometry_shader_source = gsh.read()
 
     def bind_attributes(self, attributes: Dict[str, int]):
         for name, location in attributes.items():
@@ -114,21 +113,9 @@ class Shaders:
         if glGetShaderiv(self.fragment_shader, GL_COMPILE_STATUS) == GL_FALSE:
             raise RuntimeError("Failed to compile fragment shader:\n" + glGetShaderInfoLog(self.fragment_shader).decode("utf-8"))
 
-        if self.geometry_shader_source is not None:
-            self.geometry_shader = glCreateShader(GL_GEOMETRY_SHADER)
-            glShaderSource(self.geometry_shader, self.geometry_shader_source)
-            glCompileShader(self.geometry_shader)
-
-            if glGetShaderiv(self.geometry_shader, GL_COMPILE_STATUS) == GL_FALSE:
-                raise RuntimeError(
-                    "Failed to compile geometry shader:\n" + glGetShaderInfoLog(self.geometry_shader).decode("utf-8"))
-
         self.program = glCreateProgram()
         glAttachShader(self.program, self.vertex_shader)
         glAttachShader(self.program, self.fragment_shader)
-
-        if self.geometry_shader is not None:
-            glAttachShader(self.program, self.geometry_shader)
 
     def add_uniform(self, name: str, value: Any):
         self.uniforms[name] = Uniform(name, value)
@@ -142,23 +129,18 @@ class Shaders:
         glLinkProgram(self.program)
 
         if glGetProgramiv(self.program, GL_LINK_STATUS) == GL_FALSE:
-            raise RuntimeError(f"Failed to link shader program:\n" + glGetProgramInfoLog(self.program).decode("utf-8"))
-
-        glValidateProgram(self.program)
-
-        # if glGetProgramiv(self.program, GL_VALIDATE_STATUS) == GL_FALSE:
-        #     raise RuntimeError(f"Failed to validate shader program\n" + glGetProgramInfoLog(self.program).decode("utf-8"))
+            raise RuntimeError(f"Failed to link shader program `{self.name}':\n" + glGetProgramInfoLog(self.program).decode("utf-8"))
 
         glUseProgram(self.program)
 
-        for name in self.uniforms:
-            location = glGetUniformLocation(self.program, name)
+        for uname in self.uniforms:
+            location = glGetUniformLocation(self.program, uname)
             if location == -1:
                 raise RuntimeError(
-                    f"Failed to link shader program: no such uniform `{name}'"
+                    f"Failed to link shader program `{self.name}': no such uniform `{uname}'"
                 )
 
-            self.uniforms[name].location = location
+            self.uniforms[uname].location = location
 
     def use(self, P: np.array, V: np.array, M: np.array):
         """
@@ -172,7 +154,7 @@ class Shaders:
         glUseProgram(self.program)
 
         self.uniforms["PVM"].bind(np.matmul(P, VM))
-        # self.uniforms["VM"].bind(VM)
+        self.uniforms["VM"].bind(VM)
         self.uniforms["VMiT"].bind(np.linalg.inv(VM[:3, :3].T))
         # self.uniforms["light"].bind(unhomogenise(np.dot(V, homogenise(self.light))))
 
@@ -189,16 +171,15 @@ class Shaders:
 class ShaderStore:
     def __init__(self, path: str):
         self.shaders = {
-            "fur": Shaders(
+            "fur": Shaders("fur",
                 vertex_shader_path=join(path, "fur/vertex.glsl"),
-                fragment_shader_path=join(path, "fur/fragment.glsl"),
-                geometry_shader_path=join(path, "fur/geometry.glsl")
+                fragment_shader_path=join(path, "fur/fragment.glsl")
             ),
-            "normals": Shaders(
+            "normals": Shaders("normals",
                 vertex_shader_path=join(path, "normals/vertex.glsl"),
                 fragment_shader_path=join(path, "normals/fragment.glsl"),
             ),
-            "phong": Shaders(
+            "phong": Shaders("phong",
                 vertex_shader_path=join(path, "phong/vertex_shader.glsl"),
                 fragment_shader_path=join(path, "phong/fragment_shader.glsl")
             )
