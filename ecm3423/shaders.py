@@ -117,8 +117,11 @@ class Shaders:
         glAttachShader(self.program, self.vertex_shader)
         glAttachShader(self.program, self.fragment_shader)
 
-    def add_uniform(self, name: str, value: Any):
+    def add_uniform(self, name: str, value: Optional[Any] = None):
         self.uniforms[name] = Uniform(name, value)
+
+    def set_uniform(self, name: str, value: Any):
+        self.uniforms[name].value = value
 
     def link(self, attributes: Dict[str, int]):
         """
@@ -153,10 +156,10 @@ class Shaders:
 
         glUseProgram(self.program)
 
-        self.uniforms["PVM"].bind(np.matmul(P, VM))
-        self.uniforms["VM"].bind(VM)
-        self.uniforms["VMiT"].bind(np.linalg.inv(VM[:3, :3].T))
-        # self.uniforms["light"].bind(unhomogenise(np.dot(V, homogenise(self.light))))
+        self.set_uniform("PVM", np.matmul(P, VM))
+        self.set_uniform("VM", VM)
+        self.set_uniform("VMiT", np.linalg.inv(VM[:3, :3].T))
+        # self.set_uniform("light", unhomogenise(np.dot(V, homogenise(self.light))))
 
         for uniform in self.uniforms.values():
             uniform.bind()

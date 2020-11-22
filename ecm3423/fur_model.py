@@ -7,12 +7,12 @@ from ecm3423.mesh import Mesh
 from ecm3423.shaders import Shaders
 from ecm3423.util import build_pose_matrix
 
-
 NOISE_SIZE = 512
 
 
 class FurModel:
-    def __init__(self, mesh: Mesh, shaders: Shaders, M: np.array = build_pose_matrix(), density: int = 50, length: float = 0.05, gravity: np.array = np.array([0., -0.1, 0.])):
+    def __init__(self, mesh: Mesh, shaders: Shaders, M: np.array = build_pose_matrix(), layers: int = 50,
+                 density: float = 5.0, length: float = 0.05, gravity: np.array = np.array([0., -0.1, 0.])):
         self.M = M
         self.vao = glGenVertexArrays(1)
         self.vbos = {}
@@ -23,6 +23,7 @@ class FurModel:
         self.n_vertices = 0
         self.n_elements = 0
 
+        self.layers = layers
         self.density = density
         self.length = length
         self.gravity = gravity
@@ -69,21 +70,21 @@ class FurModel:
         glBindVertexArray(0)
 
     def build_fur_mesh(self):
-        self.fur_mesh = Mesh(np.tile(self.mesh.vertices, (self.density, 1)),
-                             np.tile(self.mesh.faces, (self.density, 1)),
-                             np.tile(self.mesh.normals, (self.density, 1)))
+        self.fur_mesh = Mesh(np.tile(self.mesh.vertices, (self.layers, 1)),
+                             np.tile(self.mesh.faces, (self.layers, 1)),
+                             np.tile(self.mesh.normals, (self.layers, 1)))
 
         orig_n_vertices = self.mesh.vertices.shape[0]
-        self.layer_data = np.zeros(orig_n_vertices * self.density, 'f')
+        self.layer_data = np.zeros(orig_n_vertices * self.layers, 'f')
         for i in range(orig_n_vertices):
-            for j in range(self.density):
-                layer = j / self.density
+            for j in range(self.layers):
+                layer = j / self.layers
                 idx = orig_n_vertices * j + i
-                self.fur_mesh.vertices[idx] += self.fur_mesh.normals[idx] * self.length * layer + (self.gravity * layer ** 3)
+                self.fur_mesh.vertices[idx] += self.fur_mesh.normals[idx] * self.length * layer
                 self.layer_data[idx] = layer
 
         orig_n_faces = self.mesh.faces.shape[0]
-        for i in range(self.density):
+        for i in range(self.layers):
             self.fur_mesh.faces[i * orig_n_faces:(i + 1) * orig_n_faces] += orig_n_vertices * i
 
     def set_mesh(self, mesh: Mesh):
@@ -96,6 +97,8 @@ class FurModel:
 
     def set_shaders(self, shaders: Shaders):
         self.shaders = shaders
+        self.shaders.add_uniform("density", self.density)
+        self.shaders.add_uniform("gravity", self.gravity)
         self.shaders.link(self.attributes)
 
         glBindTexture(GL_TEXTURE_2D, self.texture)
@@ -107,12 +110,22 @@ class FurModel:
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, NOISE_SIZE, NOISE_SIZE, 0, GL_RED, GL_FLOAT, self.texture_data)
 
+    def set_density(self, density: float):
+        if density > 0.0:
+            self.density = density
+
+    def set_gravity(self, gravity: np.array):
+        self.gravity = gravity
+
     def draw(self, P: np.array, V: np.array):
         """
         Draw the mesh to the scene.
         """
         glBindVertexArray(self.vao)
         self.shaders.use(P, V, self.M)
+
+        self.shaders.set_uniform("density", self.density)
+        self.shaders.set_uniform("gravity", self.gravity)
 
         glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, self.texture)

@@ -5,6 +5,8 @@ uniform mat4 VM;
 uniform mat3 VMiT;
 
 uniform vec3 color;
+uniform float density;
+uniform vec3 gravity;
 
 in vec3 position;
 in vec3 normal;
@@ -22,5 +24,5 @@ void main()
     vs_out.position_in_view_space = vec3(VM * vec4(position, 1.0));
     vs_out.layer = layer;
 
-    gl_Position = PVM * vec4(position, 1.0);
+    gl_Position = PVM * vec4(position + gravity * pow(layer, 3), 1.0);
 }
