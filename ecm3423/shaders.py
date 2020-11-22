@@ -40,6 +40,8 @@ class Uniform:
                     raise RuntimeError(
                         f"Unable to bind uniform `{self.name}': matrix must be 4x4"
                     )
+            else:
+                raise RuntimeError(f"Unable to bind uniform `{self.name}': unsupported matrix/vector size")
         else:
             raise RuntimeError(
                 f"Unable to bind uniform `{self.name}': unsupported type `{type(self.value)}'"

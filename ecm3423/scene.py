@@ -91,10 +91,10 @@ class Scene:
         """
         if key == glfw.KEY_L:
             # increase fur length
-            pass
+            self.model.set_length(self.model.length + 0.01)
         elif key == glfw.KEY_K:
             # decrease fur length
-            pass
+            self.model.set_length(self.model.length - 0.01)
         elif key == glfw.KEY_M:
             # increase fur density
             self.model.set_density(self.model.density + 0.5)
@@ -103,7 +103,7 @@ class Scene:
             self.model.set_density(self.model.density - 0.5)
         elif key == glfw.KEY_B:
             # move fur in random direction
-            self.model.set_gravity(np.random.default_rng().normal(scale=0.1, size=3))
+            self.model.set_direction(np.random.default_rng().normal(), np.random.default_rng().normal())
         elif key == glfw.KEY_UP:
             self.camera.rotate(-1, 0)
         elif key == glfw.KEY_DOWN:

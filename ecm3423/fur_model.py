@@ -5,14 +5,14 @@ import numpy as np
 
 from ecm3423.mesh import Mesh
 from ecm3423.shaders import Shaders
-from ecm3423.util import build_pose_matrix
+from ecm3423.util import build_pose_matrix, build_rotation_matrix_xy, unhomogenise
 
 NOISE_SIZE = 512
 
 
 class FurModel:
     def __init__(self, mesh: Mesh, shaders: Shaders, M: np.array = build_pose_matrix(), layers: int = 50,
-                 density: float = 5.0, length: float = 0.05, gravity: np.array = np.array([0., -0.1, 0.])):
+                 density: float = 5.0, length: float = 0.05, gravity: np.array = np.array([0., -1., 0.])):
         self.M = M
         self.vao = glGenVertexArrays(1)
         self.vbos = {}
@@ -76,15 +76,17 @@ class FurModel:
 
         orig_n_vertices = self.mesh.vertices.shape[0]
         self.layer_data = np.zeros(orig_n_vertices * self.layers, 'f')
-        for i in range(orig_n_vertices):
-            for j in range(self.layers):
-                layer = j / self.layers
-                idx = orig_n_vertices * j + i
-                self.fur_mesh.vertices[idx] += self.fur_mesh.normals[idx] * self.length * layer
-                self.layer_data[idx] = layer
-
         orig_n_faces = self.mesh.faces.shape[0]
         for i in range(self.layers):
+            layer = i / self.layers
+
+            # Select all the vertices in this layer using this slice. Extrude each successive layer out from the
+            # original model.
+            vertices_slice = slice(i * orig_n_vertices, (i + 1) * orig_n_vertices)
+            self.layer_data[vertices_slice] = layer
+            self.fur_mesh.vertices[vertices_slice] += self.fur_mesh.normals[vertices_slice] * self.length * layer
+
+            # Select all the faces in this layer, and make sure they point to the new vertices!
             self.fur_mesh.faces[i * orig_n_faces:(i + 1) * orig_n_faces] += orig_n_vertices * i
 
     def set_mesh(self, mesh: Mesh):
@@ -114,8 +116,12 @@ class FurModel:
         if density > 0.0:
             self.density = density
 
-    def set_gravity(self, gravity: np.array):
-        self.gravity = gravity
+    def set_length(self, length: float):
+        if length > 0.0:
+            self.length = length
+
+    def set_direction(self, psi: float, phi: float):
+        self.gravity = unhomogenise(np.matmul(np.array([1.0, 1.0, 1.0, 1.0], "f"), build_rotation_matrix_xy(psi, phi)))
 
     def draw(self, P: np.array, V: np.array):
         """
@@ -125,7 +131,7 @@ class FurModel:
         self.shaders.use(P, V, self.M)
 
         self.shaders.set_uniform("density", self.density)
-        self.shaders.set_uniform("gravity", self.gravity)
+        self.shaders.set_uniform("gravity", self.gravity * self.length)
 
         glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, self.texture)
