@@ -32,6 +32,9 @@ class Camera:
     def rotate(self, psi: int, phi: int):
         """
         Rotate the camera by given deltas in x and y direction.
+
+        :param psi:
+        :param phi:
         """
         self.phi += phi * self.rot_speed
         self.psi += psi * self.rot_speed
@@ -42,6 +45,9 @@ class Camera:
     def translate(self, dx: int, dy: int):
         """
         Move the camera by the given delta x/y coordinates.
+
+        :param dx: change in the camera's x coordinate
+        :param dy: change in the camera's y coordinate
         """
         self.center[0] += dx * self.translate_speed
         self.center[1] += dy * self.translate_speed

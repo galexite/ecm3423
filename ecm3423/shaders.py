@@ -20,6 +20,11 @@ class Uniform:
         self.value = value
 
     def bind(self, value: T = None):
+        """
+        Bind the uniform given an optional value, otherwise use the value already set for this uniform.
+
+        :param value:
+        """
         if value is not None:
             self.value = value
 
@@ -31,6 +36,8 @@ class Uniform:
             if self.value.ndim == 1:
                 if self.value.shape[0] == 3:
                     glUniform3fv(self.location, 1, self.value)
+                else:
+                    raise RuntimeError(f"Unable to bind uniform `{self.name}': only 3D vectors are supported")
             elif self.value.ndim == 2:
                 if self.value.shape[0] == 3 and self.value.shape[1] == 3:
                     glUniformMatrix3fv(self.location, 1, True, self.value)
@@ -94,6 +101,12 @@ class Shaders:
             self.fragment_shader_source = fsh.read()
 
     def bind_attributes(self, attributes: Dict[str, int]):
+        """
+        Bind the given attributes (as a dictionary of name-location pairings) to this shader.
+
+        :param attributes:
+        :return:
+        """
         for name, location in attributes.items():
             glBindAttribLocation(self.program, location, name)
 
@@ -120,14 +133,29 @@ class Shaders:
         glAttachShader(self.program, self.fragment_shader)
 
     def add_uniform(self, name: str, value: Optional[Any] = None):
+        """
+
+        :param name:
+        :param value:
+        :return:
+        """
         self.uniforms[name] = Uniform(name, value)
 
     def set_uniform(self, name: str, value: Any):
+        """
+        Set the value of the given uniform. If the given uniform does not exist, KeyError will be raised.
+
+        :param name:
+        :param value:
+        :return:
+        """
         self.uniforms[name].value = value
 
     def link(self, attributes: Dict[str, int]):
         """
         Link this program.
+
+        :param attributes: A list of attribute name-location pairs to bind to the shader.
         """
         self.bind_attributes(attributes)
 
@@ -191,8 +219,15 @@ class ShaderStore:
         }
 
     def compile(self):
+        """
+        Compile all the shaders in the store.
+        """
         for name in self.shaders:
             self.shaders[name].compile()
 
     def get(self, shader_name: str) -> Shaders:
+        """
+        Retrieve a shader from the store by its name.
+        :param shader_name: name for the shader within the store
+        """
         return self.shaders[shader_name]

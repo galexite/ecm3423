@@ -36,6 +36,8 @@ class Mesh:
     def from_obj_file(path: str) -> "Mesh":
         """
         Create a new Mesh object from a Wavefront OBJ file stored on disk at the given path.
+
+        :param path: path to a Wavefront OBJ file on disk to load as a new Mesh object
         """
         vertices = []
         faces = []

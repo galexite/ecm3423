@@ -83,11 +83,17 @@ class Scene:
         _window: glfw._GLFWwindow,
         key: int,
         _scancode: int,
-        _action: int,
+        action: int,
         _modifiers: int,
     ):
         """
         Handle keyboard presses.
+
+        :param _window: window which triggered this key event (not used)
+        :param key: key involved in the event
+        :param _scancode: keyboard scancode (not used)
+        :param _action: keyboard action type
+        :param _modifiers: any modifiers which were in activated at the time (not used)
         """
         if key == glfw.KEY_L:
             # increase fur length
@@ -105,12 +111,16 @@ class Scene:
             # move fur in random direction
             self.model.set_direction(np.random.default_rng().normal(), np.random.default_rng().normal())
         elif key == glfw.KEY_UP:
+            # rotate the bunny upwards
             self.camera.rotate(-1, 0)
         elif key == glfw.KEY_DOWN:
+            # rotate the bunny downwards
             self.camera.rotate(1, 0)
         elif key == glfw.KEY_LEFT:
+            # rotate the bunny left
             self.camera.rotate(0, -1)
         elif key == glfw.KEY_RIGHT:
+            # rotate the bunny right
             self.camera.rotate(0, 1)
 
     def mouse_button_callback(
@@ -118,6 +128,10 @@ class Scene:
     ):
         """
         Handle mouse button state changes.
+
+        :param window: window which the event was triggered on
+        :param action: what action has occurred on the given button (PRESS, RELEASE...)
+        :param _modifiers: any modifiers which were in activated at the time (not used)
         """
         if button == glfw.MOUSE_BUTTON_LEFT:
             if action == glfw.PRESS:
