@@ -21,7 +21,8 @@ class Uniform:
 
     def bind(self, value: T = None):
         """
-        Bind the uniform given an optional value, otherwise use the value already set for this uniform.
+        Bind the uniform given an optional value, otherwise use the value
+        already set for this uniform.
 
         :param value:
         """
@@ -141,7 +142,8 @@ class Shaders:
 
     def set_uniform(self, name: str, value: Any):
         """
-        Set the value of the given uniform. If the given uniform does not exist, KeyError will be raised.
+        Set the value of the given uniform. If the given uniform does not
+        exist, KeyError will be raised.
 
         :param name:
         :param value:
@@ -152,7 +154,8 @@ class Shaders:
         """
         Link this program.
 
-        :param attributes: A list of attribute name-location pairs to bind to the shader.
+        :param attributes: A list of attribute name-location pairs to bind to
+        the shader.
         """
         self.bind_attributes(attributes)
 

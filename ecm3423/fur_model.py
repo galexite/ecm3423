@@ -11,7 +11,7 @@ NOISE_SIZE = 512
 
 
 class FurModel:
-    def __init__(self, mesh: Mesh, shaders: Shaders, M: np.array = build_pose_matrix(), layers: int = 25,
+    def __init__(self, mesh: Mesh, shaders: Shaders, M: np.array = build_pose_matrix(), n_layers: int = 25,
                  density: float = 5.0, length: float = 0.05, gravity: np.array = np.array([0., -1., 0.])):
         """
         Initialise a new FurModel.
@@ -19,7 +19,7 @@ class FurModel:
         :param mesh: this new model's mesh
         :param shaders: this model's shaders
         :param M: a model pose matrix to position and scale the object within the scene
-        :param layers: the number of fur layers that are to be rendered to show fur
+        :param n_layers: the number of fur layers that are to be rendered to show fur
         :param density: how dense the fur appears - the larger the number, the more clumps of fur
         :param length: how long the fur hairs appear as
         :param gravity: normalised direction for the individual fur hairs to point in away from the model's faces
@@ -37,7 +37,7 @@ class FurModel:
         self.layer_data = None
 
         # Fur properties.
-        self.layers = layers
+        self.n_layers = n_layers
         self.density = density
         self.length = length
         self.gravity = gravity
@@ -99,23 +99,24 @@ class FurModel:
         """
         Generate the additional extruded layers required for showing fur on the rendered model.
         """
-        self.fur_mesh = Mesh(np.tile(self.mesh.vertices, (self.layers, 1)),
-                             np.tile(self.mesh.faces, (self.layers, 1)),
-                             np.tile(self.mesh.normals, (self.layers, 1)))
+        self.fur_mesh = Mesh(np.tile(self.mesh.vertices, (self.n_layers, 1)),
+                             np.tile(self.mesh.faces, (self.n_layers, 1)),
+                             np.tile(self.mesh.normals, (self.n_layers, 1)))
 
         orig_n_vertices = self.mesh.vertices.shape[0]
-        self.layer_data = np.zeros(orig_n_vertices * self.layers, 'f')
+        self.layer_data = np.zeros(orig_n_vertices * self.n_layers, 'f')
         orig_n_faces = self.mesh.faces.shape[0]
-        for i in range(self.layers):
-            layer = i / self.layers
+        for i in range(self.n_layers):
+            layer = i / self.n_layers
 
-            # Select all the vertices in this layer using this slice. Extrude each successive layer out from the
-            # original model.
+            # Select all the vertices in this layer using this slice. Extrude
+            # each successive layer out from the original model.
             vertices_slice = slice(i * orig_n_vertices, (i + 1) * orig_n_vertices)
             self.layer_data[vertices_slice] = layer
             self.fur_mesh.vertices[vertices_slice] += self.fur_mesh.normals[vertices_slice] * self.length * layer
 
-            # Select all the faces in this layer, and make sure they point to the new vertices!
+            # Select all the faces in this layer, and make sure they point to
+            # the new vertices!
             self.fur_mesh.faces[i * orig_n_faces:(i + 1) * orig_n_faces] += orig_n_vertices * i
 
     def set_mesh(self, mesh: Mesh):
