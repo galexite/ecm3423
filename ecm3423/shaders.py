@@ -61,8 +61,8 @@ class Shaders:
     """
 
     light = np.array([-3.0, -3.0, 0.0], "f")
-    Ia = np.array([1.0, 1.0, 1.0], "f")
-    Id = np.array([0.9, 0.9, 0.9], "f")
+    Ia = np.array([0.9, 0.9, 0.9], "f")
+    Id = np.array([1.0, 1.0, 1.0], "f")
     Is = np.array([0.1, 0.1, 0.1], "f")
     Ka = np.array([1.0, 1.0, 1.0], "f")
     Kd = np.array([1.0, 1.0, 1.0], "f")

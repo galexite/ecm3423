@@ -96,7 +96,8 @@ class Scene:
             self.model.set_density(self.model.density - 0.5)
         elif key == pygame.K_b:
             # move fur in random direction
-            self.model.set_direction(np.random.default_rng().normal(), np.random.default_rng().normal())
+            self.model.set_direction(np.random.default_rng().normal(),
+                                     np.random.default_rng().normal())
         elif key == pygame.K_UP:
             # rotate the bunny upwards
             self.camera.rotate(-self.rot_speed, 0)
