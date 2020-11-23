@@ -23,11 +23,15 @@ in vec3 normal;
 in float layer;
 
 out vec3 fs_normal;
-out vec4 fs_color;
+out vec3 fs_color;
 out float fs_layer;
 
 void main()
 {
+    /*
+     * This shader implements Gouraud shading whilst adding gravity to extrude the fur out and away from the model for
+     * each successive layer of fur.
+     */
     fs_normal = normalize(VMiT * normal);
     vec3 position_vs = vec3(VM * vec4(position, 1.0f));
     vec3 light_direction = normalize(light - position_vs);
@@ -40,11 +44,12 @@ void main()
 
     float distance_from_light = length(light - position_vs);
     float attenuation = min(1.0,
-        1.0 / (pow(distance_from_light, 2) * 0.005) + 1.0 / (distance_from_light * 0.05));
+        1.0 / (pow(distance_from_light, 2) * 0.005));
 
-    fs_color = vec4(color * (ambient + attenuation * (diffuse + specular)), 1.0f);
+    fs_color = color * (ambient + attenuation * (diffuse + specular));
 
     fs_layer = layer;
 
+    // Add gravity for each layer of fur.
     gl_Position = PVM * vec4(position + gravity * pow(layer, 3), 1.0);
 }

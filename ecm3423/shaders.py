@@ -57,18 +57,18 @@ class Uniform:
 
 class Shaders:
     """
-    Represents a GL shader program.
+    Represents a GL shader program with a Gouraud or Phong lighting model.
     """
 
-    light = np.array([2.0, 2.0, 0.0], "f")
-    Ia = np.array([0.2, 0.2, 0.2], "f")
-    Id = np.array([0.9, 0.9, 0.9], "f")
-    Is = np.array([1.0, 1.0, 1.0], "f")
-    Ka = np.array([0.7, 0.7, 0.7], "f")
+    light = np.array([-3.0, -3.0, 0.0], "f")
+    Ia = np.array([0.8, 0.8, 0.8], "f")
+    Id = np.array([0.4, 0.4, 0.4], "f")
+    Is = np.array([0.1, 0.1, 0.1], "f")
+    Ka = np.array([1.0, 1.0, 1.0], "f")
     Kd = np.array([1.0, 1.0, 1.0], "f")
-    Ks = np.array([0.7, 0.7, 0.7], "f")
+    Ks = np.array([0.5, 0.5, 0.5], "f")
     color = np.array([150 / 255, 128 / 255, 124 / 255], "f")
-    Ns = 5.0
+    Ns = 0.5
 
     def __init__(self, name: str, vertex_shader_path: str, fragment_shader_path: str):
         self.name = name
