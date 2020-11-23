@@ -1,4 +1,4 @@
-import glfw
+import pygame
 from ecm3423.scene import Scene
 
 
@@ -15,44 +15,28 @@ def present_scene(
     :return:
     """
 
-    # Set up GLFW to explicitly request an OpenGL 3.2, core profile, forward-compatible context. Forward-compatible is
-    # required for macOS, but is meaningless on other platforms.
-    glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
-    glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 2)
-    glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
-    glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, True)
-    glfw.window_hint(glfw.SAMPLES, 4)
-    glfw.window_hint(glfw.RESIZABLE, False)
+    # Set up Pygame to explicitly request an OpenGL 3.2 core profile context.
+    pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MAJOR_VERSION, 3)
+    pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MINOR_VERSION, 2)
+    pygame.display.gl_set_attribute(pygame.GL_CONTEXT_PROFILE_MASK, pygame.GL_CONTEXT_PROFILE_CORE)
+    screen = pygame.display.set_mode((width, height), pygame.OPENGL | pygame.DOUBLEBUF, 24)
 
-    window = glfw.create_window(width, height, title, None, None)
-    if not window:
-        glfw.terminate()
-        return
-
-    glfw.make_context_current(window)
-
-    glfw.set_cursor_pos_callback(window, scene.cursor_position_callback)
-    glfw.set_key_callback(window, scene.key_callback)
-    glfw.set_mouse_button_callback(window, scene.mouse_button_callback)
-
-    scene.setup()
+    scene.setup(width, height)
 
     # Our main draw loop.
-    while not glfw.window_should_close(window):
+    running = True
+    while running:
         scene.draw()
 
-        glfw.swap_buffers(window)
-        glfw.poll_events()
+        pygame.display.flip()
+        running = scene.process_events()
 
 
 def main():
-    if not glfw.init():
-        return
+    pygame.init()
 
     scene = Scene()
     present_scene(scene, title="Fur Effect")
-
-    glfw.terminate()
 
 
 if __name__ == "__main__":

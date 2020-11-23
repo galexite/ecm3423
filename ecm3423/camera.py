@@ -12,9 +12,6 @@ class Camera:
     phi = 0.0
     distance = 5.0
 
-    rot_speed = 0.2
-    translate_speed = 0.01
-
     def __init__(self):
         self.V = np.identity(4)
         self.V[2, 3] = -5.0
@@ -29,28 +26,28 @@ class Camera:
         """
         self.V = np.matmul(np.matmul(self.T, self.R), self.D)
 
-    def rotate(self, psi: int, phi: int):
+    def rotate(self, psi: float, phi: float):
         """
         Rotate the camera by given deltas in x and y direction.
 
         :param psi:
         :param phi:
         """
-        self.phi += phi * self.rot_speed
-        self.psi += psi * self.rot_speed
+        self.phi += phi
+        self.psi += psi
         self.R = build_rotation_matrix_xy(self.psi, self.phi)
 
         self.update()
 
-    def translate(self, dx: int, dy: int):
+    def translate(self, dx: float, dy: float):
         """
         Move the camera by the given delta x/y coordinates.
 
         :param dx: change in the camera's x coordinate
         :param dy: change in the camera's y coordinate
         """
-        self.center[0] += dx * self.translate_speed
-        self.center[1] += dy * self.translate_speed
+        self.center[0] += dx
+        self.center[1] -= dy
         self.D = build_translation_matrix(self.center)
 
         self.update()

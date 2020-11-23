@@ -11,7 +11,7 @@ NOISE_SIZE = 512
 
 
 class FurModel:
-    def __init__(self, mesh: Mesh, shaders: Shaders, M: np.array = build_pose_matrix(), layers: int = 50,
+    def __init__(self, mesh: Mesh, shaders: Shaders, M: np.array = build_pose_matrix(), layers: int = 25,
                  density: float = 5.0, length: float = 0.05, gravity: np.array = np.array([0., -1., 0.])):
         """
         Initialise a new FurModel.
