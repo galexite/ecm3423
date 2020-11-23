@@ -10,11 +10,11 @@ class Camera:
     center = [0.0, 0.0, 0.0]
     psi = 0.0
     phi = 0.0
-    distance = 5.0
+    distance = 7.0
 
     def __init__(self):
         self.V = np.identity(4)
-        self.V[2, 3] = -5.0
+        self.V[2, 3] = -self.distance
 
         self.D = build_translation_matrix(self.center)
         self.R = build_rotation_matrix_xy(self.psi, self.phi)

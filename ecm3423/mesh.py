@@ -67,4 +67,14 @@ class Mesh:
                     )
                     continue
 
-        return Mesh(np.array(vertices, dtype="f"), np.array(faces, dtype="uint32"))
+        faces = np.array(faces, dtype="uint32")
+        vertices = np.array(vertices, dtype="f")
+
+        if faces.shape[1] == 4:
+            # Convert these quad faces to triangles - GL_QUADS is deprecated in OpenGL 3.2.
+            new_faces = np.ndarray((faces.shape[0] * 2, 3), "i")
+            new_faces[0::2] = faces[:, :-1]
+            new_faces[1::2] = np.hstack((new_faces[::2, ::2], faces[:, 3][:, None]))
+            return Mesh(vertices, new_faces)
+
+        return Mesh(vertices, faces)

@@ -26,7 +26,7 @@ in float layer;
 
 out vec3 fs_normal;
 out vec3 fs_color;
-out float fs_layer;
+flat out float fs_layer;
 
 void main()
 {

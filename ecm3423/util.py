@@ -6,6 +6,7 @@ def build_translation_matrix(t: List[float]) -> np.array:
     n = len(t)
     T = np.identity(n + 1, dtype="f")
     T[:n, -1] = t
+    print(T)
     return T
 
 

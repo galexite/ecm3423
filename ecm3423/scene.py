@@ -8,7 +8,8 @@ from ecm3423.camera import Camera
 from ecm3423.shaders import ShaderStore
 from ecm3423.mesh import Mesh
 from ecm3423.fur_model import FurModel
-from ecm3423.util import build_frustum_matrix, build_rotation_matrix_z, build_rotation_matrix_y, build_rotation_matrix_x
+from ecm3423.util import build_frustum_matrix, build_rotation_matrix_z, build_rotation_matrix_y, \
+    build_rotation_matrix_x, build_translation_matrix
 
 RESOURCE_PATH = join(dirname(realpath(__file__)), "..")
 
@@ -19,7 +20,7 @@ class Scene:
     """
 
     def __init__(self):
-        self.model = None
+        self.models = []
         self.rot_speed = 0.2
         self.translation_speed = 2.0
         self.camera = Camera()
@@ -53,8 +54,13 @@ class Scene:
 
         self.shader_store.compile()
 
-        mesh = Mesh.from_obj_file(join(RESOURCE_PATH, "models/bunny_world.obj"))
-        self.model = FurModel(mesh, self.shader_store.get("fur"), M=build_rotation_matrix_y(np.pi / 2.))
+        M_bunny = np.matmul(build_translation_matrix([-2.0, 0.0, 0.0]), build_rotation_matrix_y(np.pi / 2.))
+        bunny_mesh = Mesh.from_obj_file(join(RESOURCE_PATH, "models/bunny_world.obj"))
+        self.models.append(FurModel(bunny_mesh, self.shader_store.get("fur"), M=M_bunny))
+
+        M_torus = np.matmul(build_translation_matrix([2.0, 0.0, 0.0]), build_rotation_matrix_x(np.pi / 2.))
+        torus_mesh = Mesh.from_obj_file(join(RESOURCE_PATH, "models/torus.obj"))
+        self.models.append(FurModel(torus_mesh, self.shader_store.get("fur"), M=M_torus))
 
     def draw(self):
         """
@@ -65,7 +71,8 @@ class Scene:
 
         self.camera.update()
 
-        self.model.draw(self.P, self.camera.V)
+        for model in self.models:
+            model.draw(self.P, self.camera.V)
 
     def cursor_position_callback(self, x: int, y: int):
         """
@@ -84,20 +91,26 @@ class Scene:
         """
         if key == pygame.K_l:
             # increase fur length
-            self.model.set_length(self.model.length + 0.01)
+            for model in self.models:
+                model.set_length(model.length + 0.01)
         elif key == pygame.K_k:
             # decrease fur length
-            self.model.set_length(self.model.length - 0.01)
+            for model in self.models:
+                model.set_length(model.length - 0.01)
         elif key == pygame.K_m:
             # increase fur density
-            self.model.set_density(self.model.density + 0.5)
+            for model in self.models:
+                model.set_density(model.density + 0.5)
         elif key == pygame.K_n:
             # decrease fur density
-            self.model.set_density(self.model.density - 0.5)
+            for model in self.models:
+                model.set_density(model.density - 0.5)
         elif key == pygame.K_b:
             # move fur in random direction
-            self.model.set_direction(np.random.default_rng().normal(),
-                                     np.random.default_rng().normal())
+            psi = np.random.default_rng().normal()
+            phi = np.random.default_rng().normal()
+            for model in self.models:
+                model.set_direction(psi, phi)
         elif key == pygame.K_UP:
             # rotate the bunny upwards
             self.camera.rotate(-self.rot_speed, 0)

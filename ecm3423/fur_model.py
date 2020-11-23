@@ -12,7 +12,7 @@ NOISE_SIZE = 512
 
 class FurModel:
     def __init__(self, mesh: Mesh, shaders: Shaders, M: np.array = build_pose_matrix(), n_layers: int = 25,
-                 density: float = 5.0, length: float = 0.05, gravity: np.array = np.array([0., -1., 0.])):
+                 density: float = 5.0, length: float = 0.1, gravity: np.array = np.array([-0.5, -1., 0.])):
         """
         Initialise a new FurModel.
 
@@ -84,7 +84,7 @@ class FurModel:
             self.n_elements = None
         else:
             if self.fur_mesh.faces.shape[1] == 4:
-                self.primitive = GL_QUADS
+                self.primitive = GL_TRIANGLE_STRIP
             if self.index_buffer is None:
                 self.index_buffer = glGenBuffers(1)
             self.n_elements = self.fur_mesh.faces.flatten().shape[0]
