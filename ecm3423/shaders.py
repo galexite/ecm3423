@@ -64,11 +64,11 @@ class Shaders:
     Ia = np.array([0.2, 0.2, 0.2], "f")
     Id = np.array([0.9, 0.9, 0.9], "f")
     Is = np.array([1.0, 1.0, 1.0], "f")
-    Ka = np.array([1.0, 1.0, 1.0], "f")
+    Ka = np.array([0.7, 0.7, 0.7], "f")
     Kd = np.array([1.0, 1.0, 1.0], "f")
-    Ks = np.array([1.0, 1.0, 1.0], "f")
+    Ks = np.array([0.7, 0.7, 0.7], "f")
     color = np.array([150 / 255, 128 / 255, 124 / 255], "f")
-    Ns = 10.0
+    Ns = 5.0
 
     def __init__(self, name: str, vertex_shader_path: str, fragment_shader_path: str):
         self.name = name
@@ -80,17 +80,17 @@ class Shaders:
 
         self.uniforms = {
             "PVM": Uniform("PVM"),
+            "VM": Uniform("VM"),
             "VMiT": Uniform("VMiT"),
             "color": Uniform("color", self.color),
-            # We already know what model we're using, so hard-code these.
-            # "light": Uniform("light"),
-            # "Ia": Uniform("Ia", self.Ia),
-            # "Id": Uniform("Id", self.Id),
-            # "Is": Uniform("Is", self.Is),
-            # "Ka": Uniform("Ka", self.Ka),
-            # "Kd": Uniform("Kd", self.Kd),
-            # "Ks": Uniform("Ks", self.Ks),
-            # "Ns": Uniform("Ns", self.Ns),
+            "light": Uniform("light"),
+            "Ia": Uniform("Ia", self.Ia),
+            "Id": Uniform("Id", self.Id),
+            "Is": Uniform("Is", self.Is),
+            "Ka": Uniform("Ka", self.Ka),
+            "Kd": Uniform("Kd", self.Kd),
+            "Ks": Uniform("Ks", self.Ks),
+            "Ns": Uniform("Ns", self.Ns),
         }
 
         with open(vertex_shader_path, "r") as vsh:
@@ -104,7 +104,6 @@ class Shaders:
         Bind the given attributes (as a dictionary of name-location pairings) to this shader.
 
         :param attributes:
-        :return:
         """
         for name, location in attributes.items():
             glBindAttribLocation(self.program, location, name)
@@ -133,10 +132,10 @@ class Shaders:
 
     def add_uniform(self, name: str, value: Optional[Any] = None):
         """
+        Add a new uniform to the shader. Must be declared within the shader.
 
-        :param name:
-        :param value:
-        :return:
+        :param name: name of the new uniform
+        :param value: its value
         """
         self.uniforms[name] = Uniform(name, value)
 
@@ -146,7 +145,6 @@ class Shaders:
 
         :param name:
         :param value:
-        :return:
         """
         self.uniforms[name].value = value
 
@@ -177,6 +175,10 @@ class Shaders:
     def use(self, P: np.array, V: np.array, M: np.array):
         """
         Start using this program during rendering.
+
+        :param P: projection matrix
+        :param V: view matrix
+        :param M: model matrix
         """
         if self.program == None:
             raise RuntimeError("cannot use program which has not been compiled yet")
@@ -186,8 +188,9 @@ class Shaders:
         glUseProgram(self.program)
 
         self.set_uniform("PVM", np.matmul(P, VM))
+        self.set_uniform("VM", VM)
         self.set_uniform("VMiT", np.linalg.inv(VM[:3, :3].T))
-        # self.set_uniform("light", unhomogenise(np.dot(V, homogenise(self.light))))
+        self.set_uniform("light", unhomogenise(np.dot(V, homogenise(self.light))))
 
         for uniform in self.uniforms.values():
             uniform.bind()

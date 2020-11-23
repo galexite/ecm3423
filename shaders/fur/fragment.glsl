@@ -7,6 +7,7 @@ uniform vec3 light;
 uniform sampler2D noise_texture;
 
 in vec3 fs_normal;
+in vec4 fs_color;
 in float fs_layer;
 
 out vec4 frag_color;
