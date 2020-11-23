@@ -25,6 +25,7 @@ void main()
     float base_of_fur = step(fs_layer, 0.0); // 1.0 if this vertex is at the
                                              // fur's base, avoids use of `if`
                                              // which is slow on the GPU.
+                                             // Otherwise, 0.0.
     frag_color = vec4(smoothstep(0.2, 1.0, fs_layer) * fs_color,
         base_of_fur + (1 - base_of_fur) * sample.r * (1 - fs_layer));
 }
