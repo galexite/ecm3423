@@ -80,7 +80,6 @@ class Shaders:
 
         self.uniforms = {
             "PVM": Uniform("PVM"),
-            "VM": Uniform("VM"),
             "VMiT": Uniform("VMiT"),
             "color": Uniform("color", self.color),
             # We already know what model we're using, so hard-code these.
@@ -187,7 +186,6 @@ class Shaders:
         glUseProgram(self.program)
 
         self.set_uniform("PVM", np.matmul(P, VM))
-        self.set_uniform("VM", VM)
         self.set_uniform("VMiT", np.linalg.inv(VM[:3, :3].T))
         # self.set_uniform("light", unhomogenise(np.dot(V, homogenise(self.light))))
 
